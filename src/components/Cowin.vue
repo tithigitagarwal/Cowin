@@ -10,14 +10,14 @@
         <div class="flex-col-6">
           <a
             :class="{'button-active': showPostalForm}"
-            class="flex-col-6 button-style"
+            class="button-style"
             @click="setFormType(true)"
           >Search By PIN</a>
         </div>
         <div class="flex-col-6">
           <a
             :class="{'button-active': !showPostalForm}"
-            class="flex-col-6 button-style"
+            class="button-style"
             @click="setFormType(false)"
           >Search By District</a>
         </div>
@@ -26,12 +26,12 @@
         <div v-if="showPostalForm">
           <input
             type="text"
-            class="flex-col-12"
+            class="flex-col-6"
             placeholder="Enter your Pin"
             v-model="pinCode"
           >
 
-          <span class="error" v-show="pincodeError">{{ pincodeError.pincode }}</span>
+          <span class="error" v-show="errors.length && pincodeError">{{ pincodeError.pincode }}</span>
         </div>
         <div v-else>
           <div class="flex-row">
@@ -50,7 +50,7 @@
                 </option>
               </select>
 
-              <span class="error" v-show="stateError">{{ stateError.state }}</span>
+              <span class="error" v-show="errors.length && stateError">{{ stateError.state }}</span>
             </div>
             <div class="flex-col-6">
               <select
@@ -64,7 +64,7 @@
                   {{ state.district_name }}
                 </option>
               </select>
-              <span class="error" v-show="districtError">{{ districtError.district }}</span>
+              <span class="error" v-show="errors.length && districtError">{{ districtError.district }}</span>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@
       </div>
       <div v-if="noSlotsFound">
         <hr>
-        <h3> Oops No Center found!</h3>
+        <h3>Oops No Center found! We would keep searching in background in every 15 minutes, You would hear a beep once the slot is available.</h3>
       </div>
     </div>
   </div>
@@ -166,8 +166,6 @@ export default {
 
   watch: {
     errors(val) {
-      console.log('val', val);
-
       if (val.length) {
         if (this.showPostalForm) {
           this.pincodeError = val.find(err => err.pincode);
@@ -189,7 +187,6 @@ export default {
       val.forEach(center => {
         center.sessions.forEach(session => {
           if (session.available_capacity && session.min_age_limit === 18 && session.slots.length) {
-            console.log('found the center', center);
             clearInterval(searchInterval);
             this.centersFound.push(center);
 
@@ -199,14 +196,14 @@ export default {
 
             setTimeout(() => {
               audio.loop = false;
-            }, 100 * 1000);
+            }, 30 * 1000);
           }
 
           else {
             this.noSlotsFound = true;
             searchInterval = setInterval(() => {
               this.showPostalForm ? this.onPincodeEnter(this.pinCode) : this.selectedDistrict(this.district);
-            }, 10 * 1000);
+            }, 150 * 1000);
           }
         });
       });
@@ -260,9 +257,18 @@ export default {
 
     submitForm(e) {
       this.noSlotsFound = false;
+      this.errors = [];
       
       if (this.pinCode) {
-        this.onPincodeEnter(this.pinCode);
+        const regex = /^[1-9][0-9]{5}$/;
+
+        if (regex.test(this.pinCode)) {
+          this.onPincodeEnter(this.pinCode);
+        }
+
+        else {
+          this.errors.push({pincode: 'Invalid Pincode.'});
+        }
 
         return true;
       }
@@ -273,7 +279,6 @@ export default {
         return true;
       }
 
-      this.errors = [];
 
       if (this.showPostalForm) {
         if (!this.pinCode) {
@@ -325,6 +330,10 @@ export default {
 .flex-col-6 {
   flex: 0 0 50%;
   max-width: 50%;
+}
+.flex-col-4 {
+  flex: 0 0 40%;
+  max-width: 0%;
 }
 h1 {
   margin: 40px 0;
