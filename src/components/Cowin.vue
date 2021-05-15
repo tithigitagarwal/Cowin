@@ -202,7 +202,7 @@ export default {
       
       val.forEach(center => {
         center.sessions.forEach(session => {
-          if (session.available_capacity && session.min_age_limit === 45 && session.slots.length) {
+          if (session.available_capacity && session.min_age_limit === 18 && session.slots.length) {
             clearInterval(searchInterval);
             this.centersFound.push(center);
 
