@@ -1,123 +1,129 @@
 <template>
-  <div class="hello">
-    <h1>Search Vaccination Slots</h1>
-    <audio id="chatAudio">
-      <source src="https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3" 
-      type="audio/mpeg">
-    </audio>
-    <div class="wrapper">
-      <div class="flex-row">
-        <div class="flex-col-6">
-          <a
-            :class="{'button-active': showPostalForm}"
-            class="button-style"
-            @click="setFormType(true)"
-          >Search By PIN</a>
-        </div>
-        <div class="flex-col-6">
-          <a
-            :class="{'button-active': !showPostalForm}"
-            class="button-style"
-            @click="setFormType(false)"
-          >Search By District</a>
-        </div>
-      </div>
-      <form @submit="submitForm" v-on:submit.prevent>
-        <div v-if="showPostalForm">
-          <input
-            type="text"
-            class="flex-col-6"
-            placeholder="Enter your Pin"
-            v-model="pinCode"
-          >
-
-          <span class="error" v-show="errors.length && pincodeError">{{ pincodeError.pincode }}</span>
-        </div>
-        <div v-else>
-          <div class="flex-row">
-            <div class="flex-col-6">
-              <select
-                v-model="state"
-                @input="selectedState($event.target.value)"
-                @blur="selectedState($event.target.value)"
-              >
-                <option
-                  v-for="(state, index) in stateList"
-                  :key="index"
-                  :value="state.state_id"
-                >
-                  {{ state.state_name }}
-                </option>
-              </select>
-
-              <span class="error" v-show="errors.length && stateError">{{ stateError.state }}</span>
-            </div>
-            <div class="flex-col-6">
-              <select
-                v-model="district"
-              >
-                <option
-                  v-for="(state, index) in districtList"
-                  :key="index"
-                  :value="state.district_id"
-                >
-                  {{ state.district_name }}
-                </option>
-              </select>
-              <span class="error" v-show="errors.length && districtError">{{ districtError.district }}</span>
-            </div>
+  <div>
+    <div class="notification">
+      <button @click="callAlert"><img src="../assets/3602156.png" alt="Alert" /></button>
+      <p><small>Press for notification demo </small></p>
+    </div>
+    <div class="hello">
+      <h1>Search Vaccination Slots</h1>
+      <audio id="chatAudio">
+        <source src="https://media.geeksforgeeks.org/wp-content/uploads/20190531135120/beep.mp3" 
+        type="audio/mpeg">
+      </audio>
+      <div class="wrapper">
+        <div class="flex-row">
+          <div class="flex-col-6">
+            <a
+              :class="{'button-active': showPostalForm}"
+              class="button-style"
+              @click="setFormType(true)"
+            >Search By PIN</a>
+          </div>
+          <div class="flex-col-6">
+            <a
+              :class="{'button-active': !showPostalForm}"
+              class="button-style"
+              @click="setFormType(false)"
+            >Search By District</a>
           </div>
         </div>
-        <div class="flex-row">
-          <input type="submit" class="search-btn" value="Submit">
-        </div>
-      </form>
-    
-      <div v-if="centersFound.length">
-        <hr>
-        <div class="flex-row">
-          <table>
-            <thead>
-              <tr>
-                <th>Center Name</th>
-                <th>Fee Type</th>
-                <th>Count</th>
-                <th>Date</th>
-                <th>Slots Time</th>
-              </tr>
-            </thead>
-            <tr
-              v-for="(row, index) in centersFound"
-              :key="index"
+        <form @submit="submitForm" v-on:submit.prevent>
+          <div v-if="showPostalForm">
+            <input
+              type="text"
+              class="flex-col-6"
+              placeholder="Enter your Pin"
+              v-model="pinCode"
             >
-              <td> {{ row.name }}</td>
-              <td> {{ row.fee_type }}</td>
-              <td width="10%">
-                <div v-for="(slot, index) in row.sessions" :key="index">
-                  {{ slot.available_capacity }}
-                </div>
-              </td>
-              <td width="10%">
-                <div v-for="(slot, index) in row.sessions" :key="index">
-                  {{ slot.date }}
-                </div>
 
-              </td>
-              <td>
-                <div v-for="(slot, index) in row.sessions" :key="index">
-                  <span  v-for="(time, index) in slot.slots" :key="index">
-                    {{ time }}, 
-                  </span>
-                </div>
+            <span class="error" v-show="errors.length && pincodeError">{{ pincodeError.pincode }}</span>
+          </div>
+          <div v-else>
+            <div class="flex-row">
+              <div class="flex-col-6">
+                <select
+                  v-model="state"
+                  @input="selectedState($event.target.value)"
+                  @blur="selectedState($event.target.value)"
+                >
+                  <option
+                    v-for="(state, index) in stateList"
+                    :key="index"
+                    :value="state.state_id"
+                  >
+                    {{ state.state_name }}
+                  </option>
+                </select>
 
-              </td>
-            </tr>
-          </table>
+                <span class="error" v-show="errors.length && stateError">{{ stateError.state }}</span>
+              </div>
+              <div class="flex-col-6">
+                <select
+                  v-model="district"
+                >
+                  <option
+                    v-for="(state, index) in districtList"
+                    :key="index"
+                    :value="state.district_id"
+                  >
+                    {{ state.district_name }}
+                  </option>
+                </select>
+                <span class="error" v-show="errors.length && districtError">{{ districtError.district }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex-row">
+            <input type="submit" class="search-btn" value="Submit">
+          </div>
+        </form>
+      
+        <div v-if="centersFound.length">
+          <hr>
+          <div class="flex-row">
+            <table>
+              <thead>
+                <tr>
+                  <th>Center Name</th>
+                  <th>Fee Type</th>
+                  <th>Count</th>
+                  <th>Date</th>
+                  <th>Slots Time</th>
+                </tr>
+              </thead>
+              <tr
+                v-for="(row, index) in centersFound"
+                :key="index"
+              >
+                <td> {{ row.name }}</td>
+                <td> {{ row.fee_type }}</td>
+                <td width="10%">
+                  <div v-for="(slot, index) in row.sessions" :key="index">
+                    {{ slot.available_capacity }}
+                  </div>
+                </td>
+                <td width="10%">
+                  <div v-for="(slot, index) in row.sessions" :key="index">
+                    {{ slot.date }}
+                  </div>
+
+                </td>
+                <td>
+                  <div v-for="(slot, index) in row.sessions" :key="index">
+                    <span  v-for="(time, index) in slot.slots" :key="index">
+                      {{ time }}, 
+                    </span>
+                  </div>
+
+                </td>
+              </tr>
+            </table>
+          </div>
         </div>
-      </div>
-      <div v-if="noSlotsFound">
-        <hr>
-        <h3>Oops No Center found! We would keep searching in background in every 15 minutes, You would hear a beep once the slot is available.</h3>
+        <div v-if="noSlotsFound">
+          <hr>
+          <h3>Oops No Center found! We would keep searching in background in every 15 minutes, You would hear a beep once the slot is available.</h3>
+        </div>
       </div>
     </div>
   </div>
@@ -179,6 +185,16 @@ export default {
   },
 
   methods: {
+    callAlert() {
+      let audio = document.getElementById('chatAudio');
+      
+      audio.loop = true;
+      audio.play();
+
+      setTimeout(() => {
+        audio.loop = false;
+      }, 3 * 1000); // Repeat for 3 sec
+    },
     centerFilter(val) {
       let searchInterval;
 
@@ -186,24 +202,18 @@ export default {
       
       val.forEach(center => {
         center.sessions.forEach(session => {
-          if (session.available_capacity && session.min_age_limit === 18 && session.slots.length) {
+          if (session.available_capacity && session.min_age_limit === 45 && session.slots.length) {
             clearInterval(searchInterval);
             this.centersFound.push(center);
 
-            let audio = document.getElementById('chatAudio');
-            audio.loop = true;
-            audio.play();
-
-            setTimeout(() => {
-              audio.loop = false;
-            }, 30 * 1000);
+            this.callAlert();
           }
 
           else {
             this.noSlotsFound = true;
             searchInterval = setInterval(() => {
               this.showPostalForm ? this.onPincodeEnter(this.pinCode) : this.selectedDistrict(this.district);
-            }, 150 * 1000);
+            }, 15 * 60 * 1000); // Interval of 15 mins
           }
         });
       });
@@ -384,6 +394,25 @@ input, select {
   margin: 5px;
   width: 95%;
 }
+.notification {
+  text-align: right;
+}
+.notification button {
+  width: 40px;
+  height: 35px;
+}
+
+.notification button img {
+  max-width: 25px;
+  height: auto;
+}
+
+.notification p {
+  color: #e74c3c;
+  font-weight: 900;
+  margin: 5px 0;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -396,5 +425,9 @@ th, td {
 
 th:last-of-type, td:last-of-type {
   text-align: right;
+}
+
+tr:last-of-type td{
+  border: 0;
 }
 </style>
